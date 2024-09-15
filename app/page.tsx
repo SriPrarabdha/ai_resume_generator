@@ -39,6 +39,8 @@ export default function ResumeGenerator() {
         token: process.env.BLOB_READ_WRITE_TOKEN,
       });
 
+      console.log('File uploaded to Vercel Blob:', blob.url);
+
       const response = await fetch('/api/process-pdf', {
         method: 'POST',
         headers: {
@@ -51,7 +53,8 @@ export default function ResumeGenerator() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to process PDF')
+        const errorData = await response.json();
+        throw new Error(`Failed to process PDF: ${errorData.error}\nDetails: ${errorData.details}`);
       }
 
       const data = await response.json()

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatGroq } from "@langchain/groq";
-// import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import pdf from 'pdf-parse';
 import { PromptTemplate } from "@langchain/core/prompts";
 import { StructuredOutputParser } from "langchain/output_parsers";
 import { RunnableSequence } from "@langchain/core/runnables";
@@ -282,10 +281,18 @@ interface ResumeData {
         return NextResponse.json({ error: 'File URL and API key are required' }, { status: 400 });
       }
   
-      // Extract text from PDF using URL
-      const loader = new PDFLoader(fileUrl);
-      const docs = await loader.load();
-      const extractedText = docs.map((doc: { pageContent: string }) => doc.pageContent).join('\n');
+      console.log('Received file URL:', fileUrl);
+
+      // Fetch the PDF file
+      const response = await fetch(fileUrl);
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      // Extract text from PDF using pdf-parse
+      const data = await pdf(buffer);
+      console.log('PDF parsed, number of pages:', data.numpages);
+      const extractedText = data.text;
+      console.log('Extracted text length:', extractedText.length);
   
       // Select the appropriate model
       let model;
