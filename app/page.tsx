@@ -36,6 +36,7 @@ export default function ResumeGenerator() {
       // Upload file to Vercel Blob
       const blob = await put(file.name, file, {
         access: 'public',
+        token: process.env.BLOB_READ_WRITE_TOKEN,
       });
 
       const response = await fetch('/api/process-pdf', {
