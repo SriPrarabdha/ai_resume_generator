@@ -290,50 +290,7 @@ export default function ResumeGenerator() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 bg-white sm:py-24 relative overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <h2 className="text-3xl font-extrabold text-center text-gray-900 sm:text-4xl mb-12">
-            Why Choose Our AI Resume Generator?
-          </h2>
-          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              { title: 'AI-Powered', description: 'Leverage cutting-edge AI to create a standout resume' },
-              { title: 'Time-Saving', description: 'Generate a professional resume in seconds, not hours' },
-              { title: 'ATS-Friendly', description: 'Ensure your resume passes Applicant Tracking Systems' },
-              { title: 'Customizable', description: 'Easily tailor your resume for different job applications' },
-              { title: 'Modern Design', description: 'Choose from a variety of sleek, professional templates' },
-              { title: 'Easy to Use', description: 'Simple upload process with intuitive interface' },
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                className="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-xl shadow-lg"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-        {/* Background decoration */}
-        <div className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2">
-          <motion.div
-            className="w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70"
-            animate={{
-              scale: [1, 1.1, 1],
-              opacity: [0.7, 0.5, 0.7],
-            }}
-            transition={{
-              duration: 12,
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
-          />
-        </div>
-      </section>
+      
 
       {/* Generated Resume Section */}
       {generatedResume && (
