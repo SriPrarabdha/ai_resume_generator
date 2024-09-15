@@ -1,101 +1,381 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Upload, FileText, ArrowRight, CheckCircle, Key } from 'lucide-react'
+import { Button } from './components/ui/button'
+import { Progress } from './components/ui/progress'
+
+export default function ResumeGenerator() {
+  const [file, setFile] = useState<File | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [apiKey, setApiKey] = useState('')
+  const [isApiKeyValid, setIsApiKeyValid] = useState(false)
+  const [generatedResume, setGeneratedResume] = useState('')
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0]
+    if (selectedFile && selectedFile.type === 'application/pdf') {
+      setFile(selectedFile)
+    } else {
+      alert('Please upload a PDF file')
+    }
+  }
+
+  const handleGenerate = async () => {
+    if (!file || !isApiKeyValid) {
+      alert('Please upload a LinkedIn profile PDF and provide a valid API key')
+      return
+    }
+    setIsGenerating(true)
+    setProgress(0)
+
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('apiKey', apiKey)
+
+    try {
+      const response = await fetch('/api/process-pdf', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to process PDF')
+      }
+
+      const data = await response.json()
+      setGeneratedResume(data.resume)
+
+      // Simulating progress
+      for (let i = 0; i <= 100; i += 10) {
+        setProgress(i)
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+
+      setIsGenerating(false)
+      alert('Resume generated successfully!')
+    } catch (error) {
+      console.error('Error generating resume:', error)
+      setIsGenerating(false)
+      alert('An error occurred while generating the resume. Please try again.')
+    }
+  }
+
+  const handleApiKeySubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    // Here you would typically validate the API key with your backend
+    // For this example, we'll consider any non-empty string as valid
+    if (apiKey.trim() !== '') {
+      setIsApiKeyValid(true)
+    } else {
+      alert('Please enter a valid API key')
+    }
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative py-20 sm:py-32">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+            <div className="relative z-10">
+              <motion.h1 
+                className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
+                <span className="block">Transform your</span>{' '}
+                <span className="block text-indigo-600">LinkedIn profile</span>
+              </motion.h1>
+              <motion.p 
+                className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl md:mt-5 md:text-xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              >
+                Our AI-powered tool converts your LinkedIn PDF into a stunning, professional HTML resume in seconds. Stand out from the crowd and land your dream job.
+              </motion.p>
+              <motion.div 
+                className="mt-8 sm:mt-10"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+              >
+                <Button
+                  onClick={() => document.getElementById('resume-generator')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  Get Started
+                  <ArrowRight className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
+                </Button>
+              </motion.div>
+            </div>
+            <div className="relative">
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-blue-300 to-indigo-300 rounded-3xl transform rotate-3 scale-105"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1.05 }}
+                transition={{ duration: 1, delay: 0.4 }}
+              />
+              <motion.div
+                className="relative bg-white p-8 rounded-3xl shadow-2xl"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.6 }}
+              >
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, index) => (
+                    <motion.div
+                      key={index}
+                      className="h-4 bg-gray-200 rounded"
+                      style={{ width: `${Math.floor(Math.random() * 40 + 60)}%` }}
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
+                    />
+                  ))}
+                </div>
+                <motion.div
+                  className="mt-6 flex items-center text-sm text-indigo-600"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 1.6 }}
+                >
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  AI-Optimized Resume
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        {/* Background decoration */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <motion.div
+            className="w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+            animate={{
+              scale: [1, 1.1, 1],
+              opacity: [0.7, 0.5, 0.7],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+        </div>
+      </section>
+
+      {/* Resume Generator Section */}
+      <section id="resume-generator" className="py-16 sm:py-24 relative">
+        <div className="max-w-md mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white rounded-xl p-8 shadow-xl relative z-10"
+          >
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">AI Resume Generator</h2>
+            
+            {/* API Key Input */}
+            <form onSubmit={handleApiKeySubmit} className="mb-6">
+              <div className="flex items-center border-b border-indigo-500 py-2">
+                <Key className="text-indigo-500 mr-3" />
+                <input
+                  type="password"
+                  placeholder="Enter your API key"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
+                  disabled={isApiKeyValid}
+                />
+                <Button type="submit" disabled={isApiKeyValid}>
+                  {isApiKeyValid ? 'Submitted' : 'Submit'}
+                </Button>
+              </div>
+            </form>
+
+            {/* File upload area */}
+            <AnimatePresence>
+              {isApiKeyValid && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="mb-6">
+                    <label
+                      htmlFor="file-upload"
+                      className="flex flex-col items-center justify-center w-full h-32 border-2 border-indigo-300 border-dashed rounded-lg cursor-pointer bg-indigo-50 hover:bg-indigo-100 transition-colors duration-300"
+                    >
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <Upload className="w-10 h-10 mb-3 text-indigo-500" />
+                        <p className="mb-2 text-sm text-gray-500">
+                          <span className="font-semibold">Click to upload</span> or drag and drop
+                        </p>
+                        <p className="text-xs text-gray-500">LinkedIn Profile PDF</p>
+                      </div>
+                      <input id="file-upload" type="file" className="hidden" onChange={handleFileChange} accept=".pdf" />
+                    </label>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* File name display */}
+            <AnimatePresence>
+              {file && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="flex items-center justify-center mb-6 text-sm text-gray-600"
+                >
+                  <FileText className="w-4 h-4 mr-2 text-indigo-500" />
+                  {file.name}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Generate button */}
+            <AnimatePresence>
+              {isApiKeyValid && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={!file || isGenerating}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                  >
+                    <span>{isGenerating ? 'Generating...' : 'Generate HTML Resume'}</span>
+                    {!isGenerating && <ArrowRight className="w-5 h-5" />}
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Progress bar */}
+            {isGenerating && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="mt-4"
+              >
+                <Progress value={progress} className="h-2 bg-indigo-100" indicatorClassName="bg-indigo-600" />
+              </motion.div>
+            )}
+          </motion.div>
+        </div>
+        {/* Background decoration */}
+        <div className="absolute bottom-0 right-0 transform translate-x-1/4 translate-y-1/4">
+          <motion.div
+            className="w-64 h-64 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.7, 0.5, 0.7],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 bg-white sm:py-24 relative overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <h2 className="text-3xl font-extrabold text-center text-gray-900 sm:text-4xl mb-12">
+            Why Choose Our AI Resume Generator?
+          </h2>
+          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { title: 'AI-Powered', description: 'Leverage cutting-edge AI to create a standout resume' },
+              { title: 'Time-Saving', description: 'Generate a professional resume in seconds, not hours' },
+              { title: 'ATS-Friendly', description: 'Ensure your resume passes Applicant Tracking Systems' },
+              { title: 'Customizable', description: 'Easily tailor your resume for different job applications' },
+              { title: 'Modern Design', description: 'Choose from a variety of sleek, professional templates' },
+              { title: 'Easy to Use', description: 'Simple upload process with intuitive interface' },
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                className="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-xl shadow-lg"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+        {/* Background decoration */}
+        <div className="absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2">
+          <motion.div
+            className="w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70"
+            animate={{
+              scale: [1, 1.1, 1],
+              opacity: [0.7, 0.5, 0.7],
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
           />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+      </section>
+
+      {/* Generated Resume Section */}
+      {generatedResume && (
+        <section className="py-16 sm:py-24 relative">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="bg-white rounded-xl p-8 shadow-xl relative z-10"
+            >
+              <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Generated Resume</h2>
+              <div className="bg-gray-100 p-4 rounded-lg">
+                <iframe
+                  srcDoc={generatedResume}
+                  title="Generated Resume"
+                  className="w-full h-screen border-none"
+                  sandbox="allow-scripts"
+                />
+              </div>
+              <div className="mt-6 flex justify-center">
+                <Button
+                  onClick={() => {
+                    const blob = new Blob([generatedResume], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'generated_resume.html';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  }}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Download HTML Resume
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
     </div>
-  );
+  )
 }
