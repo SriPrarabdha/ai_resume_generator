@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Upload, FileText, ArrowRight, CheckCircle, Key } from 'lucide-react'
 import { Button } from './components/ui/button'
 import { Progress } from './components/ui/progress'
+import { put } from '@vercel/blob';
 
 export default function ResumeGenerator() {
   const [file, setFile] = useState<File | null>(null)
@@ -31,17 +32,22 @@ export default function ResumeGenerator() {
     setIsGenerating(true)
     setProgress(0)
 
-    const formData = new FormData()
-    // Convert File to Blob
-    const blob = new Blob([await file.arrayBuffer()], { type: file.type })
-    formData.append('file', blob, file.name)
-    formData.append('apiKey', apiKey)
-
     try {
+      // Upload file to Vercel Blob
+      const blob = await put(file.name, file, {
+        access: 'public',
+      });
+
       const response = await fetch('/api/process-pdf', {
         method: 'POST',
-        body: formData,
-      })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fileUrl: blob.url,
+          apiKey: apiKey,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error('Failed to process PDF')

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatGroq } from "@langchain/groq";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+// import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { StructuredOutputParser } from "langchain/output_parsers";
@@ -276,16 +276,14 @@ interface ResumeData {
   
   export async function POST(req: NextRequest) {
     try {
-      const formData = await req.formData();
-      const file = formData.get('file') as Blob;
-      const apiKey = formData.get('apiKey') as string;
-  
-      if (!file || !apiKey) {
-        return NextResponse.json({ error: 'File and API key are required' }, { status: 400 });
+      const { fileUrl, apiKey } = await req.json();
+
+      if (!fileUrl || !apiKey) {
+        return NextResponse.json({ error: 'File URL and API key are required' }, { status: 400 });
       }
   
-      // Extract text from PDF using Blob
-      const loader = new PDFLoader(file);
+      // Extract text from PDF using URL
+      const loader = new PDFLoader(fileUrl);
       const docs = await loader.load();
       const extractedText = docs.map((doc: { pageContent: string }) => doc.pageContent).join('\n');
   

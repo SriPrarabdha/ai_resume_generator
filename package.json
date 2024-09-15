@@ -12,6 +12,7 @@
     "@langchain/community": "^0.3.0",
     "@langchain/groq": "^0.1.1",
     "@langchain/openai": "^0.3.0",
+    "@vercel/blob": "^0.23.4",
     "framer-motion": "^11.5.4",
     "langchain": "^0.3.0",
     "lucide-react": "^0.441.0",
