@@ -32,7 +32,9 @@ export default function ResumeGenerator() {
     setProgress(0)
 
     const formData = new FormData()
-    formData.append('file', file)
+    // Convert File to Blob
+    const blob = new Blob([await file.arrayBuffer()], { type: file.type })
+    formData.append('file', blob, file.name)
     formData.append('apiKey', apiKey)
 
     try {
@@ -59,7 +61,7 @@ export default function ResumeGenerator() {
     } catch (error) {
       console.error('Error generating resume:', error)
       setIsGenerating(false)
-      alert('An error occurred while generating the resume. Please try again.')
+      alert(`An error occurred while generating the resume: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
@@ -87,7 +89,7 @@ export default function ResumeGenerator() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
-                <span className="block">Transform your</span>{' '}
+                <span className="block">Transform your</span>
                 <span className="block text-indigo-600">LinkedIn profile</span>
               </motion.h1>
               <motion.p 

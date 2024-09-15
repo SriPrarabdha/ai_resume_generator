@@ -277,14 +277,14 @@ interface ResumeData {
   export async function POST(req: NextRequest) {
     try {
       const formData = await req.formData();
-      const file = formData.get('file') as File;
+      const file = formData.get('file') as Blob;
       const apiKey = formData.get('apiKey') as string;
   
       if (!file || !apiKey) {
         return NextResponse.json({ error: 'File and API key are required' }, { status: 400 });
       }
   
-      // Extract text from PDF
+      // Extract text from PDF using Blob
       const loader = new PDFLoader(file);
       const docs = await loader.load();
       const extractedText = docs.map((doc: { pageContent: string }) => doc.pageContent).join('\n');
@@ -329,7 +329,7 @@ interface ResumeData {
       } catch (error) {
         console.error('Error parsing resume data:', error);
         console.error('Problematic JSON string:', jsonString);
-        return NextResponse.json({ error: 'Error parsing resume data', details: (error as Error).message }, { status: 500 });
+        return NextResponse.json({ error: 'Error parsing resume data', details: (error as Error).message, stack: (error as Error).stack }, { status: 500 });
       }
   
       // Process the parsed data to match our expected schema
@@ -373,6 +373,6 @@ interface ResumeData {
       return NextResponse.json({ resume: htmlResume });
     } catch (error) {
       console.error('Error processing PDF:', error);
-      return NextResponse.json({ error: 'Error processing PDF', details: (error as Error).message }, { status: 500 });
+      return NextResponse.json({ error: 'Error processing PDF', details: (error as Error).message, stack: (error as Error).stack }, { status: 500 });
     }
   }
