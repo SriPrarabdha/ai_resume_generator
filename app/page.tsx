@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Upload, FileText, ArrowRight, CheckCircle, Key } from 'lucide-react'
+import { Upload, FileText, ArrowRight, CheckCircle, Key, Cpu, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from './components/ui/button'
 import { Progress } from './components/ui/progress'
 import { put } from '@vercel/blob';
@@ -14,6 +14,7 @@ export default function ResumeGenerator() {
   const [apiKey, setApiKey] = useState('')
   const [isApiKeyValid, setIsApiKeyValid] = useState(false)
   const [generatedResume, setGeneratedResume] = useState('')
+  const [showRawHtml, setShowRawHtml] = useState(false)
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
@@ -138,26 +139,63 @@ export default function ResumeGenerator() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1, delay: 0.6 }}
               >
-                <div className="space-y-4">
-                  {[...Array(3)].map((_, index) => (
-                    <motion.div
-                      key={index}
-                      className="h-4 bg-gray-200 rounded"
-                      style={{ width: `${Math.floor(Math.random() * 40 + 60)}%` }}
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
-                    />
-                  ))}
+                <div className="space-y-6">
+                  <motion.div
+                    className="flex items-center"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.8 }}
+                  >
+                    <div className="bg-indigo-100 p-2 rounded-full mr-4">
+                      <Key className="h-6 w-6 text-indigo-600" />
+                    </div>
+                    <p className="text-gray-700">Step 1: Enter GROQ/OpenAI API Key</p>
+                  </motion.div>
+                  
+                  <motion.div
+                    className="flex items-center"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 1 }}
+                  >
+                    <div className="bg-indigo-100 p-2 rounded-full mr-4">
+                      <Upload className="h-6 w-6 text-indigo-600" />
+                    </div>
+                    <p className="text-gray-700">Step 2: Upload LinkedIn Profile PDF</p>
+                  </motion.div>
+                  
+                  <motion.div
+                    className="flex items-center"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 1.2 }}
+                  >
+                    <div className="bg-indigo-100 p-2 rounded-full mr-4">
+                      <Cpu className="h-6 w-6 text-indigo-600" />
+                    </div>
+                    <p className="text-gray-700">AI Processes Your Profile</p>
+                  </motion.div>
+                  
+                  <motion.div
+                    className="flex items-center"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 1.4 }}
+                  >
+                    <div className="bg-indigo-100 p-2 rounded-full mr-4">
+                      <FileText className="h-6 w-6 text-indigo-600" />
+                    </div>
+                    <p className="text-gray-700">Optimized Resume Generated</p>
+                  </motion.div>
                 </div>
                 <motion.div
-                  className="mt-6 flex items-center text-sm text-indigo-600"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  className="mt-6 flex items-center justify-center text-indigo-600"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 1.6 }}
                 >
                   <CheckCircle className="h-5 w-5 mr-2" />
-                  AI-Optimized Resume
+                  AI-Optimized Resume Ready!
                 </motion.div>
               </motion.div>
             </div>
@@ -315,6 +353,36 @@ export default function ResumeGenerator() {
               className="bg-white rounded-xl p-8 shadow-xl relative z-10"
             >
               <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Generated Resume</h2>
+              
+              {/* Toggle bar for raw HTML */}
+              <div 
+                className="flex items-center justify-between bg-gray-100 p-4 rounded-lg mb-4 cursor-pointer"
+                onClick={() => setShowRawHtml(!showRawHtml)}
+              >
+                <span className="font-semibold text-gray-700">
+                  {showRawHtml ? 'Hide Raw HTML' : 'Show Raw HTML'}
+                </span>
+                {showRawHtml ? <ChevronUp className="w-5 h-5 text-gray-600" /> : <ChevronDown className="w-5 h-5 text-gray-600" />}
+              </div>
+
+              {/* Raw HTML section */}
+              <AnimatePresence>
+                {showRawHtml && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="mb-6 overflow-hidden"
+                  >
+                    <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+                      {generatedResume}
+                    </pre>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Resume preview */}
               <div className="bg-gray-100 p-4 rounded-lg">
                 <iframe
                   srcDoc={generatedResume}
