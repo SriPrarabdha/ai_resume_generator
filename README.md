@@ -4,9 +4,7 @@
 <p align="center">
     <h1 align="center">AI_RESUME_GENERATOR</h1>
 </p>
-<p align="center">
-    <em><code>❯ REPLACE-ME</code></em>
-</p>
+
 <p align="center">
 	<!-- Shields.io badges disabled, using skill icons. --></p>
 <p align="center">
@@ -29,11 +27,7 @@
     - [🔖 Prerequisites](#-prerequisites)
     - [📦 Installation](#-installation)
     - [🤖 Usage](#-usage)
-    - [🧪 Tests](#-tests)
-- [📌 Project Roadmap](#-project-roadmap)
-- [🤝 Contributing](#-contributing)
-- [🎗 License](#-license)
-- [🙌 Acknowledgments](#-acknowledgments)
+
 
 ---
 
